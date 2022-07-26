@@ -1,0 +1,157 @@
+﻿@using PracticeControllerViews.Repo
+
+@*Razor syntax:
+Razor supports C# and uses the @ symbol to transition from HTML to C#. Razor evaluates C# expressions and renders them in the HTML output.*@
+
+@{
+    string message = "foreignObject example with Scalable Vector Graphics (SVG)";
+}
+
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" rx="10" ry="10" width="200" height="200" stroke="black" 
+        fill="none" />
+    <foreignObject x="20" y="20" width="160" height="160">
+        <p>@message</p>
+    </foreignObject>
+</svg>
+
+@*Implicit Razor expressions start with @ followed by C# code:*@
+<p>@DateTime.Now</p>
+<p>@DateTime.IsLeapYear(2016)</p>
+
+@*Implicit expressions cannot contain C# generics, as the characters inside the brackets (<>) are interpreted as an HTML tag. 
+The following code is not valid:*@
+@*<p>@await DoSomething("hello", "world")</p>*@
+
+
+
+@*Explicit Razor expressions
+Explicit Razor expressions consist of an @ symbol with balanced parenthesis. 
+To render last week's time, the following Razor markup is used:*@
+
+<p>Last week this time: @(DateTime.Now - TimeSpan.FromDays(7))</p>
+@*Any content within the @() parenthesis is evaluated and rendered to the output.
+Implicit expressions, described in the previous section, generally can't contain spaces.*@
+
+
+@*Explicit expressions can be used to concatenate text with an expression result:*@
+@*Explicit expressions can be used to render output from generic methods in .cshtml files. *@
+
+@{
+    var joe = new Person("Joe", 33);
+}
+
+<p>Age: @(joe.Age)</p>
+
+
+@("<span>Hello World</span>")
+@Html.Raw("<span>Hello World</span>")
+
+
+@*Razor code blocks
+Razor code blocks start with @ and are enclosed by {}. Unlike expressions, C# code inside code blocks isn't rendered. 
+Code blocks and expressions in a view share the same scope and are defined in order:*@
+
+@{
+    var quote = "The future depends on what you do today. - Mahatma Gandhi";
+}
+
+<p>@quote</p>
+
+@{
+    quote = "Hate cannot drive out hate, only love can do that. - Martin Luther King, Jr.";
+}
+
+<p>@quote</p>
+
+@*In code blocks, local functions with markup can also declared to serve as templating methods:*@
+
+@{
+    void RenderName(string name)
+    {
+    <p>Name: <strong>@name</strong></p>
+    }
+
+    RenderName("Mahatma Gandhi");
+    RenderName("Martin Luther King, Jr.");
+}
+
+@*    Implicit transitions
+The default language in a code block is C#, but the Razor Page can transition back to HTML:*@
+@{
+    var inCSharp = true;
+    <p>Now in HTML, was in C# @inCSharp</p>
+}
+
+@*Explicit delimited transition
+To define a subsection of a code block that should render HTML, surround the characters for rendering with the Razor <text> tag:
+
+The <text> tag is useful to control whitespace when rendering content:
+
+Only the content between the <text> tag is rendered.
+No whitespace before or after the <text> tag appears in the HTML output.
+*@
+
+@{
+    string[] people = { "Hemant", "Rahul", "Mayank" };
+}
+@for (var i = 0; i < people.Length; i++)
+{
+    var person = people[i];
+    <text>      Name: @person,</text>
+}
+
+@*Explicit line transition
+To render the rest of an entire line as HTML inside a code block, use @: syntax:*@
+
+@for (var i = 0; i < people.Length; i++)
+{
+    var person = people[i];
+    @:Name: @person,
+}
+
+@*
+Conditionals @if, else if, else, and @switch*@
+
+@{
+    var value = 100;
+}
+@if (value % 2 == 0)
+{
+    <p>The value was even.</p>
+}
+else if (value >= 1337)
+{
+    <p>The value is large.</p>
+}
+else
+{
+    <p>The value is odd and small.</p>
+}
+
+
+ @*   Looping @for, @foreach, @while, and @do while
+ Templated HTML can be rendered with looping control statements. To render a list of people:
+ *@
+
+
+
+@for (var i = 0; i < people.Length; i++)
+{
+    var person = people[i];
+    @:Name: @person,
+}
+
+@*Compound @using
+In C#, a using statement is used to ensure an object is disposed. In Razor, the same mechanism is used to 
+create HTML Helpers that contain additional content. 
+In the following code, HTML Helpers render a <form> tag with the @using statement:*@
+
+@using (Html.BeginForm())
+{
+    <div>
+        Email: <input type="email" id="Email" value="Enter Email">
+        <button>Register</button>
+    </div>
+}
+
